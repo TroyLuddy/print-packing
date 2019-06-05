@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 08.09 - Load stl model </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/68/three.min.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r68/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r68/src/core/Projector.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r68/examples/js/renderers/SVGRenderer.js"></script>
+    <!-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r105/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r105/examples/js/renderers/SVGRenderer.js"></script>
+    <-->
+    
+
+    <script type="text/javascript" src="stats.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+	var loader = new THREE.STLLoader();
+        loader.load("example-stl/elbow.stl", function (geometry) {
+	    var stats = initStats();
+	    // create a scene, that will hold all our elements such as objects, cameras and lights.
+	    var scene = new THREE.Scene();
+	    // add spotlight for the shadows
+	    var spotLight = new THREE.SpotLight(0xffffff);
+	    spotLight.position.set(150, 150, 150);
+	    scene.add(spotLight);
+	    // create a render and set the size
+	    var webGLRenderer = new THREE.WebGLRenderer();
+	    webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
+	    webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+	    webGLRenderer.shadowMapEnabled = true;
+	    // add the output of the renderer to the html element
+	    document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+	    // call the render function
+	    var step = 0;
+	    // model from http://www.thingiverse.com/thing:69709
+	    var group = new THREE.Object3D();
+	    var camera;
+	    geometry.center();
+            var mat = new THREE.MeshBasicMaterial({color: 0x7777ff});
+            group = new THREE.Mesh(geometry, mat);
+	    var bbox = new THREE.Box3().setFromObject(group);
+	    console.log('Bounding Box:');
+	    console.log(bbox);
+            //group.rotation.x = -0.5 * Math.PI;
+            group.scale.set(0.6, 0.6, 0.6);
+            scene.add(group);
+
+	    // create a camera, which defines where we're looking at.
+	    camera = new THREE.OrthographicCamera( bbox.min.x, bbox.max.x, bbox.max.z, bbox.min.z, 1, 500);
+	    // position and point the camera to the center of the scene
+	    camera.position.x = 0;
+	    camera.position.y = 50;
+	    camera.position.z = 0;
+	    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+	    console.log('Hello?');
+	    var svgRenderer = new THREE.SVGRenderer();
+	    console.log('Hello?');
+	    svgRenderer.setClearColor(0xffffff);
+	    svgRenderer.setSize(window.innerWidth, window.innerHeight);
+	    svgRenderer.setQuality('high');
+	    svgRenderer.render(scene,camera);
+	    console.log('SVG: ');
+	    console.log(svgRenderer.domElement);
+
+	    function render() {
+		stats.update();
+		// render using requestAnimationFrame
+		requestAnimationFrame(render);
+		webGLRenderer.render(scene, camera);
+	    }
+	    render();
+	    function initStats() {
+		var stats = new Stats();
+		stats.setMode(0); // 0: fps, 1: ms
+		// Align top-left
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+		document.getElementById("Stats-output").appendChild(stats.domElement);
+		return stats;
+	    }
+        });
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
