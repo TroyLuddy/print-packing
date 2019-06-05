@@ -2,22 +2,73 @@
 
 <html>
 
-<head>
-    <title>Example 08.09 - Load stl model </title>
-    <script src="main.js"></script>
-    <style>
-        body {
-            /* set margin to 0 and overflow to hidden, to go fullscreen */
-            margin: 0;
-            overflow: hidden;
-        }
-    </style>
-</head>
-<body>
+    <head>
+	<title>SLS Packing</title>
+	<script src="main.js"></script>
+	<!-- Bulma -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    </head>
+    <body>
+	<section class="section">
+	    <div class="container">
+		<h1 class="title is-1">
+		    Hello!
+		</h1>
+		<p class="is-size-5">Welcome to the SLS packing application.</p>
+		<br/>
+		<div class="field">
+		    <label class="label">Print Dimensions (mm)</label>
+		    <div class="control">
+			<input class="input" type="text" placeholder="Width" style="width: 40%">
+			<input class="input" type="text" placeholder="Depth" style="width: 40%">
+		    </div>
+		</div>
+		<p>All parts must be in STL format. In addition they must be in millimeters and be in the desired print orientation.</p>
+		<br/>
+		<div class="file">
+		    <label class="file-label">
+			<input class="file-input" type="file" name="parts" id="parts-input" multiple>
+			<span class="file-cta">
+			    <span class="file-icon">
+				<i class="fas fa-upload"></i>
+			    </span>
+			    <span class="file-label">
+				Upload Part File
+			    </span>
+			</span>
+		    </label>
+		</div>
+		<br/>
+		<table class="table">
+		    <thead>
+			<th>Part Name</th>
+			<th>Quantity</th>
+		    </thead>
+		    <tbody id="parts-list">
+		    </tbody>
+		</table>
+		<!-- Used to fill in table with file input -->
+		<template id="part-row">
+		    <tr>
+			<td></td>
+			<td><input class="input" placeholder='Quantity'></td>
+		    </tr>
+		</template>
 
-<!-- Div which will hold the Output -->
-<div id="WebGL-output">
-</div>
+		<button class="button is-primary" id="load-stl">
+		    Go!
+		</button>
 
-</body>
-</html>
+		<br/>
+		<br/>
+		<div id="svgContainer">
+		</div>
+		<!-- Div which will hold the Output -->
+		<div id="WebGL-output" style="width: 100%; height: 500px">
+		</div>
+	    </div>
+	</section>
+
+    </body>
+</html>	
