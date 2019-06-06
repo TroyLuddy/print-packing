@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 
-import { ImageTracer } from './imagetracer.js';
+import * as ImageTracer from './imagetracer.js';
 
 export function STLToSVG(geometry) {
     // create a scene, that will hold all our elements such as objects, cameras and lights.
@@ -25,11 +25,9 @@ export function STLToSVG(geometry) {
     var camera;
     geometry.center();
     var mat = new THREE.MeshBasicMaterial({color: 0x7777ff});
-    mat.wireframe = true;
+    //mat.wireframe = true;
     group = new THREE.Mesh(geometry, mat);
     var bbox = new THREE.Box3().setFromObject(group);
-    console.log('Bounding Box:');
-    console.log(bbox);
     //group.rotation.x = -0.5 * Math.PI;
     group.scale.set(0.6, 0.6, 0.6);
     scene.add(group);
@@ -42,29 +40,31 @@ export function STLToSVG(geometry) {
     camera.position.z = 0;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-    /*
-    var svgRenderer = new SVGRenderer();
-    svgRenderer.setClearColor(0xffffff);
-    svgRenderer.setSize(window.innerWidth, window.innerHeight);
-    svgRenderer.setQuality('high');
-    svgRenderer.render(scene,camera);
-    console.log('SVG: ');
-    console.log(svgRenderer.domElement);
-    */
-
-    // Convert to SVG
-    var pngDataURL = webGLRenderer.domElement.toDataURL();
-    console.log(pngDataURL);
-    ImageTracer.imageToSVG(pngDataURL, function(svgString) {
-	ImageTracer.appendSVGString( svgString, 'svgContainer');
-
-    }, 'posterized2d');
+    var capture = true;
 
     // render using requestAnimationFrame
     function render() {
 	requestAnimationFrame(render);
 	webGLRenderer.render(scene, camera);
+	if(capture) {
+	    capture = false;
+	    var pngDataURL = webGLRenderer.domElement.toDataURL();
+	    // Convert to SVG
+	    ImageTracer.imageToSVG(pngDataURL, function(svgString) {
+		ImageTracer.appendSVGString( svgString, 'svgContainer');
+	    }, 'posterized2d');
+	    //downloadURI(pngDataURL, 'render.png');
+	}
     }
     render();
 
 };
+
+function downloadURI(uri, name) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
