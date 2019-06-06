@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	});
     });
 
+    var pixelsPerMM = 10;
     var loadSTLButton = document.getElementById('load-stl');
     loadSTLButton.addEventListener('click', function() {
 	// Add dimensions to output SVG
@@ -27,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	var height = document.getElementById('printDepth').value;
 	rect.setAttributeNS(null, 'x', 0);
         rect.setAttributeNS(null, 'y', 0);
-        rect.setAttributeNS(null, 'height', width);
-        rect.setAttributeNS(null, 'width', height);
+        rect.setAttributeNS(null, 'height', width * pixelsPerMM);
+        rect.setAttributeNS(null, 'width', height * pixelsPerMM);
         rect.setAttributeNS(null, 'stroke', 'white');
         rect.setAttributeNS(null, 'stroke-width', '1');
 	combinedSVG.appendChild(rect);

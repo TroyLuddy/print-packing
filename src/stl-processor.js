@@ -14,26 +14,22 @@ export function STLToSVG(geometry) {
     var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set(150, 150, 150);
     scene.add(spotLight);
-    // create a render and set the size
-    var webGLRenderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
-    webGLRenderer.setClearColor(new THREE.Color(0x000000, 0));
-    webGLRenderer.setSize(window.innerWidth, window.innerHeight);
-    webGLRenderer.shadowMapEnabled = true;
-    // add the output of the renderer to the html element
-    document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
     // call the render function
     var step = 0;
     // model from http://www.thingiverse.com/thing:69709
     var group = new THREE.Object3D();
     var camera;
     geometry.center();
-    var mat = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var mat = new THREE.MeshBasicMaterial({color: 0x00ff00});
     //mat.wireframe = true;
     group = new THREE.Mesh(geometry, mat);
     var bbox = new THREE.Box3().setFromObject(group);
+    console.log("Bounding Box for part:");
+    console.log(bbox);
     //group.rotation.x = -0.5 * Math.PI;
-    group.scale.set(0.6, 0.6, 0.6);
+    group.scale.set(1, 1, 1);
     scene.add(group);
+
 
     // create a camera, which defines where we're looking at.
     camera = new THREE.OrthographicCamera( bbox.min.x, bbox.max.x, bbox.max.z, bbox.min.z, 1, 500);
@@ -43,9 +39,19 @@ export function STLToSVG(geometry) {
     camera.position.z = 0;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-    var capture = true;
+
+    var pixelsPerMM = 10;
+    // create a render and set the size
+    var webGLRenderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+    webGLRenderer.setClearColor(new THREE.Color(0x000000, 0));
+    var webGLRendererContainer = document.getElementById("WebGL-output");
+    webGLRenderer.setSize(pixelsPerMM*(bbox.max.x - bbox.min.x), pixelsPerMM*(bbox.max.z - bbox.min.z));
+    webGLRenderer.shadowMapEnabled = true;
+    // add the output of the renderer to the html element
+    document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
 
     // render using requestAnimationFrame
+    var capture = true;
     function render() {
 	requestAnimationFrame(render);
 	webGLRenderer.render(scene, camera);
@@ -59,7 +65,7 @@ export function STLToSVG(geometry) {
 		var svgElement = document.getElementById('svgContainer').children[0];
 		var printBedHeight = document.getElementById('printDepth').value;
 		Array.from(svgElement.children).forEach(path => {
-		    if(path.getAttribute('fill') == 'rgb(255,255,255)') {
+		    if(path.getAttribute('fill') == 'rgb(0,255,0)') {
 			var parts = document.getElementById('parts-list').querySelectorAll('input');
 			var quantity = parts[currentPart].value;
 			currentPart += 1;
