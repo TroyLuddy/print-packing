@@ -4,6 +4,9 @@ import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 
 import * as ImageTracer from './imagetracer.js';
 
+var currentOffsetX = 0;
+var currentPart = 0;
+
 export function STLToSVG(geometry) {
     // create a scene, that will hold all our elements such as objects, cameras and lights.
     var scene = new THREE.Scene();
@@ -13,7 +16,7 @@ export function STLToSVG(geometry) {
     scene.add(spotLight);
     // create a render and set the size
     var webGLRenderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
-    webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
+    webGLRenderer.setClearColor(new THREE.Color(0x000000, 0));
     webGLRenderer.setSize(window.innerWidth, window.innerHeight);
     webGLRenderer.shadowMapEnabled = true;
     // add the output of the renderer to the html element
@@ -24,7 +27,7 @@ export function STLToSVG(geometry) {
     var group = new THREE.Object3D();
     var camera;
     geometry.center();
-    var mat = new THREE.MeshBasicMaterial({color: 0x7777ff});
+    var mat = new THREE.MeshBasicMaterial({color: 0xffffff});
     //mat.wireframe = true;
     group = new THREE.Mesh(geometry, mat);
     var bbox = new THREE.Box3().setFromObject(group);
@@ -51,7 +54,42 @@ export function STLToSVG(geometry) {
 	    var pngDataURL = webGLRenderer.domElement.toDataURL();
 	    // Convert to SVG
 	    ImageTracer.imageToSVG(pngDataURL, function(svgString) {
+		var combinedSVG = document.getElementById('combinedSVG');
 		ImageTracer.appendSVGString( svgString, 'svgContainer');
+		var svgElement = document.getElementById('svgContainer').children[0];
+		var printBedHeight = document.getElementById('printDepth').value;
+		Array.from(svgElement.children).forEach(path => {
+		    if(path.getAttribute('fill') == 'rgb(255,255,255)') {
+			var parts = document.getElementById('parts-list').querySelectorAll('input');
+			var quantity = parts[currentPart].value;
+			currentPart += 1;
+			for(var i = 0; i < quantity; i++) {
+			    var pathClone = path.cloneNode();
+			    // We have to place this somewhere not in another element
+			    // Get Bounding Box of this path
+			    var bbox = path.getBBox();
+			    // Move the path to below the print bed
+			    pathClone.setAttribute('transform', 'translate(' + currentOffsetX + ',' + printBedHeight + ')');
+			    currentOffsetX += bbox.width;
+			    combinedSVG.appendChild(pathClone);
+			    // Update size of canvas
+			    resizeSVG(combinedSVG);
+			}
+			// Are we finished?
+			if(currentPart == parts.length) {
+			    var s = new XMLSerializer().serializeToString(document.getElementById("combinedSVG"));
+			    /*
+			    var encodedData = window.btoa(s);
+			    var encodedDataURI = 'data:image/svg+xml;base64,' + encodedData;
+			    window.sessionStorage.setItem('svg-data', encodedDataURI);
+			    */
+			    window.sessionStorage.setItem('svg-data', s);
+			    window.location.href = 'SVGnest/index.html';
+			}
+		    }
+		});
+		svgElement.remove();
+		// Add to combined SVG
 	    }, 'posterized2d');
 	    //downloadURI(pngDataURL, 'render.png');
 	}
@@ -67,4 +105,13 @@ function downloadURI(uri, name) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+function resizeSVG(svg) {
+  // Get the bounds of the SVG content
+  var  bbox = svg.getBBox();
+  // Update the width and height using the size of the contents
+  svg.setAttribute("width", bbox.x + bbox.width + bbox.x);
+  svg.setAttribute("height", bbox.y + bbox.height + bbox.y);
+  svg.setAttribute('viewBox', "0 0 " + (bbox.x + bbox.width + bbox.x) + ' ' + (bbox.y + bbox.height + bbox.y));
 }

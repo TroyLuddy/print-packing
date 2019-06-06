@@ -1,4 +1,4 @@
 [submodule "SVGnest"]
-	path = SVGnest
+	path = dist/SVGnest
 	url = https://github.com/Jack000/SVGnest
 	branch = master

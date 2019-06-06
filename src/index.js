@@ -20,6 +20,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     var loadSTLButton = document.getElementById('load-stl');
     loadSTLButton.addEventListener('click', function() {
+	// Add dimensions to output SVG
+	var combinedSVG = document.getElementById('combinedSVG');
+	var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+	var width = document.getElementById('printWidth').value;
+	var height = document.getElementById('printDepth').value;
+	rect.setAttributeNS(null, 'x', 0);
+        rect.setAttributeNS(null, 'y', 0);
+        rect.setAttributeNS(null, 'height', width);
+        rect.setAttributeNS(null, 'width', height);
+        rect.setAttributeNS(null, 'stroke', 'white');
+        rect.setAttributeNS(null, 'stroke-width', '1');
+	combinedSVG.appendChild(rect);
+
 	var processFileFunc = function(event) {
 	    var url = event.target.result;
 	    stlLoader.load(url, STLToSVG);
@@ -31,5 +44,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	    fileReader.onload = processFileFunc;
 	    fileReader.readAsDataURL(file);
 	});
+	
     });
 });
