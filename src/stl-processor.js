@@ -16,7 +16,6 @@ export function STLToSVG(geometry) {
     scene.add(spotLight);
     // call the render function
     var step = 0;
-    // model from http://www.thingiverse.com/thing:69709
     var group = new THREE.Object3D();
     var camera;
     geometry.center();
