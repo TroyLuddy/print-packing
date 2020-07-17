@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "cash-dom": "^4.1.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "three": "^0.105.2"
   }
 }
